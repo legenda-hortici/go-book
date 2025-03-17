@@ -1,0 +1,114 @@
+{{ define "blocks" }}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/prismjs@1.27.0/themes/prism.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.27.0/prism.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.27.0/components/prism-go.min.js"></script>
+    <title>Golang-book</title>
+</head>
+<body>
+    <style>
+        /* Сохраняем отступы и переносы строк */
+        textarea {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }    
+    </style>
+
+    {{ template "header" .}}
+
+    <main>
+        <div class="container mt-5">
+            <a href="/" class="btn btn-outline-secondary btn-sm mb-3">
+                <i class="bi bi-arrow-left"></i> Назад
+            </a>
+            <h2>{{ .Topic.Title }}</h2>
+            <input type="hidden" id="topicID" value="{{ .Topic.ID.Hex }}">
+        </div>
+
+        <div class="container mt-5">
+            {{range .Blocks}}
+            <div class="list-group-item list-group-item-action mb-2 p-3 w-100 rounded position-relative border border-secondary pe-5">
+                <div>
+                    <!-- Используем <pre> для отображения отформатированного кода -->
+                    {{ if eq .Type "code" }}
+                    <pre class="language-go"><code>{{.Content}}</code></pre>
+                    {{ else }}
+                    <p>{{.Content}}</p>
+                    {{ end }}
+                </div>
+                <div class="position-absolute top-0 end-0 mt-2 me-2">
+                    <form action="/blocks/delete/{{ .ID.Hex }}" method="post">
+                        <button type="submit" class="btn btn-danger btn-sm">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>                        
+            {{end}}
+
+            <div class="d-flex justify-content-end mb-4">
+                <button type="button" class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#addBlockModal">
+                    +
+                </button>
+            </div>
+
+            <!-- Модальное окно для добавления блока -->
+            <div class="modal fade" id="addBlockModal" tabindex="-1" aria-labelledby="addBlockModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-xl">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="addBlockModalLabel">Добавить блок</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="addTopicForm" action="/topic/{{ .Topic.ID.Hex }}/add_block" method="POST">
+                                <!-- Выбор типа блока (текст или код) -->
+                                <div class="mb-3">
+                                    <label for="blockType" class="form-label">Тип блока</label>
+                                    <select id="blockType" name="blockType" class="form-select" required>
+                                        <option value="text">Текст</option>
+                                        <option value="code">Код</option>
+                                    </select>
+                                </div>
+
+                                <!-- Поле для ввода контента (будет менять тип в зависимости от выбранного) -->
+                                <div class="mb-3">
+                                    <label for="content" class="form-label">Контент блока</label>
+                                    <textarea class="form-control" id="content" name="content" rows="20" required></textarea>
+                                </div>
+
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Закрыть</button>
+                                    <button type="submit" form="addTopicForm" class="btn btn-primary">Добавить</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Динамическое изменение поля ввода в зависимости от типа блока
+        document.getElementById('blockType').addEventListener('change', function() {
+            const contentField = document.getElementById('content');
+            if (this.value === 'code') {
+                contentField.setAttribute('style', 'white-space: pre-wrap; word-wrap: break-word;');
+            } else {
+                contentField.removeAttribute('style');
+            }
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+{{ end }}

@@ -1,0 +1,68 @@
+{{ define "main" }}
+<div class="container mt-5">
+    <!-- Кнопка "+" в правом верхнем углу -->
+    <div class="d-flex justify-content-end mb-4">
+        <button type="button" class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#addTopicModal">
+            +
+        </button>
+    </div>
+
+    <!-- Список тем -->
+    <div class="list-group">
+        {{range .Topics}}
+        <div class="list-group-item list-group-item-action mb-2 p-3 position-relative" style="border-radius: 8px;">
+            <a href="/topic/{{.ID.Hex}}" class="text-decoration-none text-dark">
+                <div>
+                    <h5 class="mb-1">{{.Title}}</h5>
+                    <p class="mb-1">{{.Description}}</p>
+                </div>
+            </a>
+            <!-- Выпадающий список с троеточием -->
+            <div class="dropdown position-absolute top-0 end-0 mt-2 me-2" style="z-index: 1;">
+                <button class="btn btn-light btn-sm" type="button" id="dropdownMenuButton{{.ID.Hex}}" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-three-dots"></i> <!-- Иконка троеточия -->
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton{{.ID}}">
+                    <li>
+                        <form action="/delete_topic/{{ .ID.Hex }}" method="post">
+                            <button type="submit" class="dropdown-item">Удалить</button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        {{end}}
+    </div>
+</div>
+
+<!-- Модальное окно для добавления новой темы -->
+<div class="modal fade" id="addTopicModal" tabindex="-1" aria-labelledby="addTopicModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addTopicModalLabel">Добавить новую тему</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addTopicForm" action="/add_topic" method="POST">
+                    <div class="mb-3">
+                        <label for="topicTitle" class="form-label">Название темы</label>
+                        <input type="text" class="form-control" id="topicTitle" name="topicTitle" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="topicDescription" class="form-label">Краткое описание</label>
+                        <textarea class="form-control" id="topicDescription" rows="3" name="topicDescription" required></textarea>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Закрыть</button>
+                        <button type="submit" form="addTopicForm" class="btn btn-primary">Добавить</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+{{ end }}
+
