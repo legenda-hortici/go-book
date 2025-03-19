@@ -33,6 +33,21 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+    <script>
+        document.getElementById('searchInput').addEventListener('input', function() {
+            let filter = this.value.toLowerCase();
+            let topics = document.querySelectorAll('.list-group-item');
+    
+            topics.forEach(topic => {
+                let title = topic.querySelector('h5').textContent.toLowerCase();
+                if (title.includes(filter)) {
+                    topic.style.display = "";
+                } else {
+                    topic.style.display = "none";
+                }
+            });
+        });
+    </script>    
 </body>
 </html>
 {{ end }}
