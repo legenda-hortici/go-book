@@ -6,10 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/prismjs@1.27.0/themes/prism.css" rel="stylesheet" />
-    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.27.0/prism.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.27.0/components/prism-go.min.js"></script>
     <title>Golang-book</title>
 </head>
 <body>
@@ -43,14 +40,43 @@
                     <p>{{.Content}}</p>
                     {{ end }}
                 </div>
-                <div class="position-absolute top-0 end-0 mt-2 me-2">
-                    <form action="/blocks/delete/{{ .ID.Hex }}" method="post">
-                        <button type="submit" class="btn btn-danger btn-sm">
-                            <i class="bi bi-trash"></i>
+                <div class="position-absolute top-0 end-0 mt-1 me-2">
+                    <div class="d-flex flex-column align-items-end">
+                        <form action="/blocks/delete/{{ .ID.Hex }}" method="post">
+                            <button type="submit" class="btn btn-danger btn-sm mb-1">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </form>
+                        <!-- Кнопка для редактирования -->
+                        <button type="button" class="btn btn-warning btn-sm mb-1" data-bs-toggle="modal" data-bs-target="#editModal{{ .ID.Hex }}">
+                            <i class="bi bi-pencil"></i>
                         </button>
-                    </form>
+                    </div>
+                </div>                
+            </div>
+            <!-- Модальное окно для редактирования -->
+            <div class="modal fade" id="editModal{{ .ID.Hex }}" tabindex="-1" aria-labelledby="editModalLabel{{ .ID.Hex }}" aria-hidden="true">
+                <div class="modal-dialog modal-xl">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="editModalLabel{{ .ID.Hex }}">Редактировать блок</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                        </div>
+                        <form action="/blocks/edit/{{ .ID.Hex }}" method="post">
+                            <div class="modal-body">
+                                <div class="mb-3">
+                                    <label for="content{{ .ID.Hex }}" class="form-label">Содержимое</label>
+                                    <textarea class="form-control" id="content{{ .ID.Hex }}" name="content" rows="20">{{ .Content }}</textarea>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                                <button type="submit" class="btn btn-primary">Сохранить</button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
-            </div>                        
+            </div>
             {{end}}
             
             <div class="position-fixed bottom-0 end-0 mb-3 me-3">
@@ -68,6 +94,7 @@
                 </button>
             </div>
 
+            
             
 
             <!-- Модальное окно для добавления блока -->
@@ -126,7 +153,8 @@
             window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
         }
     </script>
-
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.27.0/prism.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.27.0/components/prism-go.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

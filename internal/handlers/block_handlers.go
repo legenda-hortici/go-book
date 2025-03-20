@@ -106,3 +106,27 @@ func (h *BlockHandler) DeleteBlockHandler(w http.ResponseWriter, r *http.Request
 
 	http.Redirect(w, r, "/topic/"+TopicID+"/blocks", http.StatusSeeOther)
 }
+
+func (h *BlockHandler) UpdateBlockHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	blockID := mux.Vars(r)["id"]
+	content := r.FormValue("content")
+
+	id, err := primitive.ObjectIDFromHex(blockID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	err = h.service.UpdateBlock(models.Block{ID: id, Content: content})
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	http.Redirect(w, r, "/topic/"+TopicID+"/blocks", http.StatusSeeOther)
+}

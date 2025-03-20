@@ -31,6 +31,7 @@ func RegisterRoutes() *mux.Router {
 	mux.HandleFunc("/topic/{id}/blocks", blockHandlers.ShowBlockHandler)
 	mux.HandleFunc("/topic/{id}/add_block", blockHandlers.AddBlockHandler).Methods("POST")
 	mux.HandleFunc("/blocks/delete/{id}", blockHandlers.DeleteBlockHandler).Methods("POST")
+	mux.HandleFunc("/blocks/edit/{id}", blockHandlers.UpdateBlockHandler).Methods("POST")
 
 	mux.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("web/static"))))
 

@@ -30,3 +30,7 @@ func (s *BlockService) DeleteAllBlocks(id primitive.ObjectID) error {
 func (s *BlockService) DeleteBlock(block models.Block) error {
 	return s.repo.DeleteBlock(block.ID)
 }
+
+func (s *BlockService) UpdateBlock(block models.Block) error {
+	return s.repo.UpdateBlock(block.ID, block.Content)
+}

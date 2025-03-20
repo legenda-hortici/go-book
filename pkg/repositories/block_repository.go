@@ -81,3 +81,15 @@ func (r *BlockRepository) DeleteBlock(blockID primitive.ObjectID) error {
 	}
 	return nil
 }
+
+func (r *BlockRepository) UpdateBlock(blockID primitive.ObjectID, content string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	_, err := r.collection.UpdateOne(ctx, bson.M{"_id": blockID}, bson.M{"$set": bson.M{"content": content}})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
