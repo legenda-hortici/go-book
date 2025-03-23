@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"os"
 	"time"
@@ -15,11 +16,10 @@ import (
 var Client *mongo.Client
 
 // Инициализация базы данных
-func InitDB() {
+func InitDB() error {
 	// Загрузка переменных окружения из .env файла
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatalf("Error loading .env file")
+	if err := godotenv.Load(); err != nil {
+		return fmt.Errorf("error loading .env file: %w", err)
 	}
 
 	// Получаем URI и имя базы данных из переменных окружения
@@ -27,33 +27,38 @@ func InitDB() {
 	dbName := os.Getenv("DB_NAME")
 
 	if mongoURI == "" || dbName == "" {
-		log.Fatalf("Mongo URI or DB Name is not set in .env file")
+		return fmt.Errorf("mongo URI or DB Name is not set in .env file")
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	clientOptions := options.Client().ApplyURI(mongoURI)
-	var err2 error
-	Client, err2 = mongo.Connect(ctx, clientOptions)
-	if err2 != nil {
-		log.Fatalf("Error connecting to MongoDB: %v", err2)
+	var err error
+	Client, err = mongo.Connect(ctx, clientOptions)
+	if err != nil {
+		return fmt.Errorf("error connecting to MongoDB: %w", err)
 	}
 
-	err = Client.Ping(ctx, nil)
-	if err != nil {
-		log.Fatalf("Error pinging MongoDB: %v", err)
+	if err = Client.Ping(ctx, nil); err != nil {
+		return fmt.Errorf("error pinging MongoDB: %w", err)
 	}
+
 	log.Println("Connected to MongoDB!")
+	return nil
 }
 
-func GetDB(collectionName string) *mongo.Collection {
+func GetDB(collectionName string) (*mongo.Collection, error) {
 	if Client == nil {
-		log.Fatal("MongoDB client is not initialized")
+		return nil, fmt.Errorf("MongoDB client is not initialized")
 	}
 
 	dbName := os.Getenv("DB_NAME")
-	return Client.Database(dbName).Collection(collectionName)
+	if dbName == "" {
+		return nil, fmt.Errorf("DB_NAME environment variable is not set")
+	}
+
+	return Client.Database(dbName).Collection(collectionName), nil
 }
 
 func ExtractObjectID(input string) (primitive.ObjectID, error) {
@@ -65,7 +70,7 @@ func CloseDB() {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
 		if err := Client.Disconnect(ctx); err != nil {
-			log.Fatalf("Error disconnecting from MongoDB: %v", err)
+			log.Printf("Error disconnecting from MongoDB: %v", err)
 		}
 		log.Println("Disconnected from MongoDB.")
 	}

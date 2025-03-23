@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"go-book/internal/services"
 	"go-book/pkg/models"
+	"log"
 	"net/http"
 
 	"go-book/pkg/repositories"
@@ -26,6 +27,7 @@ func (h *BlockHandler) AddBlockHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	ctx := r.Context()
 	vars := mux.Vars(r)["id"]
 	id, err := primitive.ObjectIDFromHex(vars)
 	if err != nil {
@@ -44,7 +46,7 @@ func (h *BlockHandler) AddBlockHandler(w http.ResponseWriter, r *http.Request) {
 		Content: content,
 	}
 
-	if err := h.service.AddBlock(block); err != nil {
+	if err := h.service.AddBlock(ctx, block); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -55,6 +57,7 @@ func (h *BlockHandler) AddBlockHandler(w http.ResponseWriter, r *http.Request) {
 var TopicID string
 
 func (h *BlockHandler) ShowBlockHandler(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
 	vars := mux.Vars(r)["id"]
 	TopicID = vars
 
@@ -64,13 +67,13 @@ func (h *BlockHandler) ShowBlockHandler(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	blocks, err := h.service.GetBlocks(id)
+	blocks, err := h.service.GetBlocks(ctx, id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	topic, err := repositories.GetTopicInfo(id)
+	topic, err := repositories.GetTopicInfo(ctx, id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -89,6 +92,7 @@ func (h *BlockHandler) DeleteBlockHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 
+	ctx := r.Context()
 	vars := mux.Vars(r)
 	idStr := vars["id"]
 
@@ -98,7 +102,7 @@ func (h *BlockHandler) DeleteBlockHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	err = h.service.DeleteBlock(models.Block{ID: id})
+	err = h.service.DeleteBlock(ctx, models.Block{ID: id})
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -113,6 +117,7 @@ func (h *BlockHandler) UpdateBlockHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 
+	ctx := r.Context()
 	blockID := mux.Vars(r)["id"]
 	content := r.FormValue("content")
 
@@ -122,7 +127,7 @@ func (h *BlockHandler) UpdateBlockHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	err = h.service.UpdateBlock(models.Block{ID: id, Content: content})
+	err = h.service.UpdateBlock(ctx, models.Block{ID: id, Content: content})
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

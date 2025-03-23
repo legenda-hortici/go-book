@@ -1,6 +1,7 @@
 package services
 
 import (
+	"context"
 	"go-book/pkg/models"
 	"go-book/pkg/repositories"
 )
@@ -13,14 +14,14 @@ func NewTopicService(repo *repositories.TopicRepository) *TopicService {
 	return &TopicService{repo: repo}
 }
 
-func (s *TopicService) CreateTopic(topic models.Topic) error {
-	return s.repo.InsertTopic(topic)
+func (s *TopicService) CreateTopic(ctx context.Context, topic models.Topic) error {
+	return s.repo.InsertTopic(ctx, topic)
 }
 
-func (s *TopicService) GetTopics() ([]models.Topic, error) {
-	return s.repo.GetTopics()
+func (s *TopicService) GetTopics(ctx context.Context) ([]models.Topic, error) {
+	return s.repo.GetTopics(ctx)
 }
 
-func (s *TopicService) DeleteTopic(topic models.Topic) error {
-	return s.repo.DeleteTopic(topic)
+func (s *TopicService) DeleteTopic(ctx context.Context, topic models.Topic) error {
+	return s.repo.DeleteTopic(ctx, topic)
 }

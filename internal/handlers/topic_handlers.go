@@ -22,7 +22,8 @@ func NewTopicHandler(service *services.TopicService) *TopicHandler {
 }
 
 func (h *TopicHandler) MainHandler(w http.ResponseWriter, r *http.Request) {
-	topics, err := h.service.GetTopics()
+	ctx := r.Context()
+	topics, err := h.service.GetTopics(ctx)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -44,6 +45,7 @@ func (h *TopicHandler) CreateTopicHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 
+	ctx := r.Context()
 	var topic models.Topic
 	title := r.FormValue("topicTitle")
 	description := r.FormValue("topicDescription")
@@ -53,7 +55,7 @@ func (h *TopicHandler) CreateTopicHandler(w http.ResponseWriter, r *http.Request
 		Description: description,
 	}
 
-	if err := h.service.CreateTopic(topic); err != nil {
+	if err := h.service.CreateTopic(ctx, topic); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -67,6 +69,7 @@ func (h *TopicHandler) DeleteTopicHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 
+	ctx := r.Context()
 	vars := mux.Vars(r)
 	idStr := vars["id"]
 
@@ -76,7 +79,7 @@ func (h *TopicHandler) DeleteTopicHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	err = h.service.DeleteTopic(models.Topic{ID: id})
+	err = h.service.DeleteTopic(ctx, models.Topic{ID: id})
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

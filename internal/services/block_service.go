@@ -1,6 +1,7 @@
 package services
 
 import (
+	"context"
 	"go-book/pkg/models"
 	"go-book/pkg/repositories"
 
@@ -15,22 +16,22 @@ func NewBlockService(repo *repositories.BlockRepository) *BlockService {
 	return &BlockService{repo: repo}
 }
 
-func (b *BlockService) AddBlock(block models.Block) error {
-	return b.repo.InsertBlock(block)
+func (b *BlockService) AddBlock(ctx context.Context, block models.Block) error {
+	return b.repo.InsertBlock(ctx, block)
 }
 
-func (s *BlockService) GetBlocks(id primitive.ObjectID) ([]models.Block, error) {
-	return s.repo.GetBlocks(id)
+func (s *BlockService) GetBlocks(ctx context.Context, id primitive.ObjectID) ([]models.Block, error) {
+	return s.repo.GetBlocks(ctx, id)
 }
 
-func (s *BlockService) DeleteAllBlocks(id primitive.ObjectID) error {
-	return s.repo.DeleteAllBlocks(id)
+func (s *BlockService) DeleteAllBlocks(ctx context.Context, id primitive.ObjectID) error {
+	return s.repo.DeleteAllBlocks(ctx, id)
 }
 
-func (s *BlockService) DeleteBlock(block models.Block) error {
-	return s.repo.DeleteBlock(block.ID)
+func (s *BlockService) DeleteBlock(ctx context.Context, block models.Block) error {
+	return s.repo.DeleteBlock(ctx, block.ID)
 }
 
-func (s *BlockService) UpdateBlock(block models.Block) error {
-	return s.repo.UpdateBlock(block.ID, block.Content)
+func (s *BlockService) UpdateBlock(ctx context.Context, block models.Block) error {
+	return s.repo.UpdateBlock(ctx, block.ID, block.Content)
 }

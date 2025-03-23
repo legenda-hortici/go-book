@@ -19,8 +19,8 @@ func NewBlockRepository(collection *mongo.Collection) *BlockRepository {
 	return &BlockRepository{collection: collection}
 }
 
-func (b *BlockRepository) InsertBlock(block models.Block) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+func (b *BlockRepository) InsertBlock(ctx context.Context, block models.Block) error {
+	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
 
 	_, err := b.collection.InsertOne(ctx, block)
@@ -32,9 +32,9 @@ func (b *BlockRepository) InsertBlock(block models.Block) error {
 	return nil
 }
 
-func (r *BlockRepository) GetBlocks(topicID primitive.ObjectID) ([]models.Block, error) {
+func (r *BlockRepository) GetBlocks(ctx context.Context, topicID primitive.ObjectID) ([]models.Block, error) {
 	var blocks []models.Block
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
 
 	cursor, err := r.collection.Find(ctx, bson.M{"topic_id": topicID})
@@ -60,8 +60,8 @@ func (r *BlockRepository) GetBlocks(topicID primitive.ObjectID) ([]models.Block,
 	return blocks, nil
 }
 
-func (r *BlockRepository) DeleteAllBlocks(topicID primitive.ObjectID) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+func (r *BlockRepository) DeleteAllBlocks(ctx context.Context, topicID primitive.ObjectID) error {
+	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
 
 	_, err := r.collection.DeleteMany(ctx, bson.M{"topic_id": topicID})
@@ -71,8 +71,8 @@ func (r *BlockRepository) DeleteAllBlocks(topicID primitive.ObjectID) error {
 	return nil
 }
 
-func (r *BlockRepository) DeleteBlock(blockID primitive.ObjectID) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+func (r *BlockRepository) DeleteBlock(ctx context.Context, blockID primitive.ObjectID) error {
+	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
 
 	_, err := r.collection.DeleteOne(ctx, bson.M{"_id": blockID})
@@ -82,8 +82,8 @@ func (r *BlockRepository) DeleteBlock(blockID primitive.ObjectID) error {
 	return nil
 }
 
-func (r *BlockRepository) UpdateBlock(blockID primitive.ObjectID, content string) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+func (r *BlockRepository) UpdateBlock(ctx context.Context, blockID primitive.ObjectID, content string) error {
+	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
 
 	_, err := r.collection.UpdateOne(ctx, bson.M{"_id": blockID}, bson.M{"$set": bson.M{"content": content}})

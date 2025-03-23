@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"go-book/internal/handlers"
 	"go-book/internal/services"
 	"go-book/pkg/db"
@@ -10,15 +11,22 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func RegisterRoutes() *mux.Router {
-
+func RegisterRoutes() (*mux.Router, error) {
 	// Инизиализация репозитория и сервиса для Topic
-	topicRepo := repositories.NewTopicRepository(db.GetDB("topics"))
+	topicsCollection, err := db.GetDB("topics")
+	if err != nil {
+		return nil, fmt.Errorf("failed to get topics collection: %w", err)
+	}
+	topicRepo := repositories.NewTopicRepository(topicsCollection)
 	topicService := services.NewTopicService(topicRepo)
 	topicHandlers := handlers.NewTopicHandler(topicService)
 
 	// Инизиализация репозитория и сервиса для Block
-	blockRepo := repositories.NewBlockRepository(db.GetDB("blocks"))
+	blocksCollection, err := db.GetDB("blocks")
+	if err != nil {
+		return nil, fmt.Errorf("failed to get blocks collection: %w", err)
+	}
+	blockRepo := repositories.NewBlockRepository(blocksCollection)
 	blockService := services.NewBlockService(blockRepo)
 	blockHandlers := handlers.NewBlockHandler(blockService)
 
@@ -35,5 +43,5 @@ func RegisterRoutes() *mux.Router {
 
 	mux.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("web/static"))))
 
-	return mux
+	return mux, nil
 }
